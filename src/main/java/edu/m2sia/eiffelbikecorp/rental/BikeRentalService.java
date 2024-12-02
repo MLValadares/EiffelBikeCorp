@@ -14,7 +14,7 @@ import java.util.List;
 @Path("/bikeRental")
 public class BikeRentalService {
 
-    private BikeRentalManager manager = new BikeRentalManager();
+    private static final BikeRentalManager manager = new BikeRentalManager();
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
     @GET
@@ -24,11 +24,13 @@ public class BikeRentalService {
         return "Hello World!";
     }
 
+//    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental
     @GET
     public List<Bike> getAllBikes() {
         return manager.getAllBikes();
     }
 
+//    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/rent/1
     @POST
     @Path("/rent/{id}")
     public Response rentBike(@PathParam("id") int id) {
