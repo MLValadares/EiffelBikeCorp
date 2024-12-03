@@ -1,16 +1,14 @@
-package edu.m2sia.eiffelbikecorp.rental;
+package edu.m2sia.eiffelbikecorp.service;
 
-import edu.m2sia.model.*;
+import edu.m2sia.eiffelbikecorp.model.Bike;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-public class BikeRentalManager {
-    private List<Bike> bikes = new ArrayList<>();
+public class BikeRentalService {
+    private final List<Bike> bikes = new ArrayList<>();
 
-    public BikeRentalManager() {
+    public BikeRentalService() {
         // Initialize with some bikes
         bikes.add(new Bike(1, "Mountain Bike", true));
         bikes.add(new Bike(2, "Road Bike", true));

@@ -1,7 +1,4 @@
-package edu.m2sia.model;
-
-import java.util.ArrayList;
-import java.util.List;
+package edu.m2sia.eiffelbikecorp.model;
 
 public class User {
     private int id;

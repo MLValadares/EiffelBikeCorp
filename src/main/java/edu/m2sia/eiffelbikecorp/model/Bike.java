@@ -1,4 +1,4 @@
-package edu.m2sia.model;
+package edu.m2sia.eiffelbikecorp.model;
 
 public class Bike {
     private int id;

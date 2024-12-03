@@ -1,6 +1,7 @@
-package edu.m2sia.eiffelbikecorp.rental;
+package edu.m2sia.eiffelbikecorp.controller;
 
-import edu.m2sia.model.*;
+import edu.m2sia.eiffelbikecorp.model.Bike;
+import edu.m2sia.eiffelbikecorp.service.BikeRentalService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -12,9 +13,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/bikeRental")
-public class BikeRentalService {
+public class BikeRentalController {
 
-    private static final BikeRentalManager manager = new BikeRentalManager();
+    private static final BikeRentalService manager = new BikeRentalService();
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
     @GET
