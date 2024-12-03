@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.Map;
 
 // Treats the api paths
 
@@ -39,7 +40,7 @@ public class BikeRentalController {
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
-        Bike rentedBike = bikeService.rentBike(id, user.getUsername());
+        Bike rentedBike = bikeService.rentBike(id, user.getId());
         if (rentedBike != null) {
             user.rentBike(id);
             return Response.ok(rentedBike).build();
@@ -49,16 +50,71 @@ public class BikeRentalController {
 
     @POST
     @Path("/return/{id}")
-    public Response returnBike(@PathParam("id") int id, @HeaderParam("Authorization") String token) {
+    public Response returnBike(
+            @PathParam("id") int id,
+            @HeaderParam("Authorization") String token,
+            @QueryParam("conditionRating") int conditionRating,
+            @QueryParam("conditionNotes") String conditionNotes) {
         User user = userService.getUserByToken(token);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
-        Bike returnedBike = bikeService.returnBike(id, user.getUsername() );
+
+        if (conditionRating < 1 || conditionRating > 5) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Condition rating must be between 1 and 5.").build();
+        }
+
+        Bike returnedBike = bikeService.returnBike(id, user.getId(), conditionRating, conditionNotes); // Pass user ID
+//        System.out.println("Returned bike: " + returnedBike);
         if (returnedBike != null) {
-            user.returnBike(id);
             return Response.ok(returnedBike).build();
         }
         return Response.status(Response.Status.BAD_REQUEST).entity("Invalid return request").build();
     }
+
+
+    //methodo para criar uma bicicleta
+    @PUT
+    @Path("/add")
+    public Response addBike(@HeaderParam("Authorization") String token, Map<String, String> bikeData) {
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+
+        String model = bikeData.get("model");
+        if (model == null || model.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Bike model is required").build();
+        }
+
+        Bike newBike = bikeService.addBike(model, user.getUsername());
+        return Response.ok(newBike).build();
+    }
+
+    @DELETE
+    @Path("/remove/{bikeId}")
+    public Response removeBike(@HeaderParam("Authorization") String token, @PathParam("bikeId") int bikeId) {
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+
+        boolean removed = bikeService.removeBike(bikeId, user.getUsername());
+        if (!removed) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Bike cannot be removed. Ensure you own the bike and it is not currently rented.")
+                    .build();
+        }
+
+        return Response.ok("Bike successfully removed").build();
+    }
+
+//    @GET
+//    @Path("/waitingList/{bikeId}")
+//    public Response getWaitingList(@PathParam("bikeId") int bikeId) {
+//        Queue<String> queue = bikeService.getWaitingList(bikeId);
+//        return Response.ok(queue).build();
+//    }
+
 }

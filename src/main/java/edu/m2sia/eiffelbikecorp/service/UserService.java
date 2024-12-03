@@ -4,10 +4,12 @@ import edu.m2sia.eiffelbikecorp.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 public class UserService {
     private static final Map<String, User> users = new HashMap<>(); // Keyed by username
     private static final Map<String, String> sessions = new HashMap<>(); // Keyed by token, maps to username
+
 
     public UserService() {
         // Predefined users for demo
@@ -20,15 +22,15 @@ public class UserService {
         if (user != null && user.getPassword().equals(password)) {
             String token = "token-" + username + "-" + System.currentTimeMillis(); //substitur
             sessions.put(token, username);
-            System.out.println("Generated token: " + token);
-            System.out.println("Sessions map: " + sessions);
+//            System.out.println("Generated token: " + token);
+//            System.out.println("Sessions map: " + sessions);
             return token;
         }
         return null; // Authentication failed
     }
 
     public User getUserByToken(String token) {
-        System.out.println(sessions);
+//        System.out.println(sessions);
         String username = sessions.get(token);
         return username != null ? users.get(username) : null;
     }
