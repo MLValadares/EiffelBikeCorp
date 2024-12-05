@@ -1,14 +1,17 @@
 package edu.m2sia.eiffelbikecorp.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class Bike {
     private int id;
     private String model;
     private boolean isAvailable;
     private String owner;
-    private final List<Rating> ratings;
+    private static final List<Rating> ratings = new ArrayList<>();;
+    private final Queue<Integer> waitingList = new LinkedList<>();
 
     // Constructor
     public Bike(int id, String model, boolean isAvailable, String owner) {
@@ -16,7 +19,6 @@ public class Bike {
         this.model = model;
         this.isAvailable = isAvailable;
         this.owner = owner;
-        this.ratings = new ArrayList<>(); // Initialize the ratings list
     }
 
     // Getters and Setters
@@ -56,6 +58,24 @@ public class Bike {
     }
 
     public void addRating(Rating rating) {
-        this.ratings.add(rating);
+        ratings.add(rating);
+    }
+
+    public boolean addWaitingList(int userId) {
+            if (!waitingList.contains(userId)) {
+                waitingList.offer(userId);
+                return true;
+            }
+            return false;
+    }
+
+
+
+    public void removeWaitingList(int userId) {
+        waitingList.remove(userId);
+    }
+
+    public Integer getNextUserInWaitingList() {
+        return waitingList.poll();
     }
 }

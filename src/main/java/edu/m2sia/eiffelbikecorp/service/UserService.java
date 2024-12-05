@@ -34,4 +34,12 @@ public class UserService {
         String username = sessions.get(token);
         return username != null ? users.get(username) : null;
     }
+
+    public void notifyUser(int userId, String message) {
+        User user = users.values().stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        if (user != null) {
+            // Implement your notification logic here (e.g., send an email, SMS, etc.)
+            System.out.println("Notifying user " + user.getUsername() + ": " + message);
+        }
+    }
 }

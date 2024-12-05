@@ -2,7 +2,6 @@ package edu.m2sia.eiffelbikecorp.service;
 
 import edu.m2sia.eiffelbikecorp.model.Bike;
 import edu.m2sia.eiffelbikecorp.model.Rating;
-import edu.m2sia.eiffelbikecorp.model.User;
 
 import java.util.*;
 
@@ -10,9 +9,10 @@ public class BikeRentalService {
     private static final Map<Integer, Bike> bikes = new HashMap<>();
     private static final Map<Integer, Integer> bikeRenters = new HashMap<>();
     private int nextBikeId = 1;
-    private static final Map<Integer, Queue<String>> waitingList = new HashMap<>();
+    private final UserService userService;
 
-    public BikeRentalService() {
+    public BikeRentalService(UserService userService) {
+        this.userService = userService;
         // Initialize with some bikes
 //        bikes.add(new Bike(1, "Mountain Bike", true, "Eiffel Bike Corp"));
 //        bikes.add(new Bike(2, "Road Bike", true, "Eiffel Bike Corp"));
@@ -32,37 +32,28 @@ public class BikeRentalService {
         return new ArrayList<>(bikes.values());
     }
 
-    public Bike rentBike(int id, int userId) {
+    public enum RentBikeResult {
+        SUCCESS,
+        NOT_AVAILABLE,
+        ADDED_TO_WAITING_LIST
+    }
+
+    public RentBikeResult rentBike(int id, int userId, boolean waitingList) {
         Bike bike = bikes.get(id);
         if (bike != null && bike.isAvailable()) {
             bike.setAvailable(false);
-            bikeRenters.put(id, userId); // Store user ID as a string
-            return bike;
+            bikeRenters.put(id, userId);
+            return RentBikeResult.SUCCESS;
+        } else if (bike != null && waitingList) {
+            boolean success = bike.addWaitingList(userId); //ver repeticao de users
+            if(success){
+                return RentBikeResult.ADDED_TO_WAITING_LIST;
+            }else {
+                return RentBikeResult.NOT_AVAILABLE;
+            }
         }
-        return null; // Bike not available
+        return RentBikeResult.NOT_AVAILABLE;
     }
-
-
-//    public boolean rentBike(int bikeId, String userToken) {
-//        Bike bike = bikes.get(bikeId);
-//        if (bike == null) {
-//            throw new IllegalArgumentException("Bike not found");
-//        }
-//        if (!bike.isAvailable()) {
-//            // Bike is unavailable, add the user to the waiting list
-//            waitingList.putIfAbsent(bikeId, new LinkedList<>());
-//            Queue<String> queue = waitingList.get(bikeId);
-//            if (!queue.contains(userToken)) {
-//                queue.offer(userToken);
-//            }
-//            return false; // Indicate that the bike is not currently rentable
-//        }
-//
-//        // Rent the bike
-//        bike.setAvailable(false);
-//        bikeRenters.put(bikeId, userToken); // Track who is renting the bike
-//        return true;
-//    }
 
     public Bike returnBike(int id, int userId, int conditionRating, String conditionNotes) {
 //        System.out.println("bikeRenters: " + bikeRenters);
@@ -77,10 +68,17 @@ public class BikeRentalService {
                 Rating rating = new Rating(conditionRating, conditionNotes, userId);
                 bike.addRating(rating);
 
+                //notify the next user in the waiting list
+                Integer nextUser = bike.getNextUserInWaitingList();
+                if (nextUser != null) {
+                    userService.notifyUser(nextUser, "The bike with ID " + id + " is now available for rent.");
+                }
                 return bike;
             }
         }
         return null; // Unauthorized or invalid return
+
+        //notify the next user in the waiting list
     }
 
 
