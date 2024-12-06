@@ -15,8 +15,9 @@ import java.util.Map;
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/bikeRental")
 public class BikeRentalController {
+    private static final String USER_SERVICE_URL = "http://localhost:8080/EiffelBikeCorp_war_exploded/api/users";
     private static final UserService userService = new UserService();
-    private static final BikeRentalService bikeService = new BikeRentalService(userService);
+    private static final BikeRentalService bikeService = new BikeRentalService(USER_SERVICE_URL);
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET

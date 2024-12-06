@@ -45,4 +45,13 @@ public class UserController {
             return Response.status(Response.Status.CONFLICT).entity("Username already exists").build();
         }
     }
+
+    @POST
+    @Path("/notify")
+    public Response notifyUser(Map<String, Object> notificationData) {
+        int userId = (int) notificationData.get("userId");
+        String message = (String) notificationData.get("message");
+        userService.notifyUser(userId, message);
+        return Response.ok("User notified successfully").build();
+    }
 }
