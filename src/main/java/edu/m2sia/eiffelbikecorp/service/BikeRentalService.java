@@ -77,8 +77,6 @@ public class BikeRentalService {
             }
         }
         return null; // Unauthorized or invalid return
-
-        //notify the next user in the waiting list
     }
 
 
