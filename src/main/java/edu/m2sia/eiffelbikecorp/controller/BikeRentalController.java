@@ -6,6 +6,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class BikeRentalController {
     private static final BikeRentalService bikeService = new BikeRentalService(userService);
     private static final BankService bankService = new BankService();
     private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
+    private static final CurrencyExchangeService currencyExchangeService = new CurrencyExchangeService();
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET
@@ -144,12 +146,21 @@ public class BikeRentalController {
 
     @GET
     @Path("/gustaveBike/basket")
-    public Response getBasket(@HeaderParam("Authorization") String token) {
+    public Response getBasket(@HeaderParam("Authorization") String token, @QueryParam("currency") String currency) {
         User user = userService.getUserByToken(token);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
-        return Response.ok(user.getBasket()).build();
+        Basket basket = user.getBasket();
+        double totalPrice = basket.getTotalPrice();
+        Map<String, Object> response = new HashMap<>();
+        response.put("bikes", basket.getBikes());
+        response.put("totalPrice", totalPrice);
+        if (currency != null && !currency.isEmpty()) {
+            double convertedPrice = currencyExchangeService.convert(totalPrice, currency);
+            response.put("totalPriceIn" + currency, convertedPrice);
+        }
+        return Response.ok(response).build();
     }
 
 //    @POST
