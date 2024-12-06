@@ -66,6 +66,14 @@ public class BikeRentalService {
         return new ArrayList<>(bikes.values());
     }
 
+    public Bike getBikeById(int bikeId) {
+        return bikes.get(bikeId);
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
     public enum RentBikeResult {
         SUCCESS,
         NOT_AVAILABLE,

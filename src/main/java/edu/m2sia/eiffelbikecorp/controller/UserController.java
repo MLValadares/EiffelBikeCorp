@@ -45,29 +45,4 @@ public class UserController {
             return Response.status(Response.Status.CONFLICT).entity("Username already exists").build();
         }
     }
-
-    @POST
-    @Path("/notify")
-    public Response notifyUser(Map<String, Object> notificationData) {
-        int userId = (int) notificationData.get("userId");
-        String message = (String) notificationData.get("message");
-        userService.notifyUser(userId, message);
-        return Response.ok("User notified successfully").build();
-    }
-
-    @GET
-    @Path("/token")
-    public Response getUserIdByToken(@HeaderParam("Authorization") String token) {
-        return Response.ok(userService.getUserIdByToken(token)).build();
-    }
-
-    @GET
-    @Path("/{userId}/username")
-    public Response getUsernameById(@PathParam("userId") Integer userId) {
-        String username = userService.getUsernameById(userId);
-        if (username != null) {
-            return Response.ok(username).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
-    }
 }
