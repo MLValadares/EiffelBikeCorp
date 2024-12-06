@@ -10,7 +10,7 @@ public class Bike {
     private String model;
     private boolean isAvailable;
     private String owner;
-    private static final List<Rating> ratings = new ArrayList<>();
+    private final List<Rating> ratings = new ArrayList<>(); //não por static
     private final Queue<Integer> waitingList = new LinkedList<>();
 
     // Constructor
