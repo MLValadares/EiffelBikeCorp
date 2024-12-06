@@ -11,13 +11,12 @@ import jakarta.ws.rs.core.Response;
 import java.util.*;
 
 public class BikeRentalService {
+    private static final String USER_SERVICE_URL = "http://localhost:8080/EiffelBikeCorp_war_exploded/api/users";
     private static final Map<Integer, Bike> bikes = new HashMap<>();
     private static final Map<Integer, Integer> bikeRenters = new HashMap<>();
     private int nextBikeId = 1;
-    private final String userServiceUrl;
 
-    public BikeRentalService(String userServiceUrl) {
-        this.userServiceUrl = userServiceUrl;
+    public BikeRentalService() {
         // Initialize with some bikes
 //        bikes.add(new Bike(1, "Mountain Bike", true, "Eiffel Bike Corp"));
 //        bikes.add(new Bike(2, "Road Bike", true, "Eiffel Bike Corp"));
@@ -25,6 +24,36 @@ public class BikeRentalService {
         addBike("Mountain Bike", "Eiffel Bike Corp");
         addBike("Road Bike", "Eiffel Bike Corp");
         addBike("Hybrid Bike", "Eiffel Bike Corp");
+    }
+
+    public Integer getUserIdByToken(String token) {
+        Client client = ClientBuilder.newClient();
+        Response response = client.target(USER_SERVICE_URL + "/token")
+                .request(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .get();
+        System.out.println("Response status: " + response.getStatus());
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            return response.readEntity(Integer.class);
+        }
+        return null;
+    }
+
+    private String getUsernameById(Integer userId) {
+        Client client = ClientBuilder.newClient();
+        Response response = client.target(USER_SERVICE_URL + "/" + userId + "/username")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            return response.readEntity(String.class);
+        }
+        return null;
+    }
+
+    public Bike addBike(String model, Integer userId) {
+        Bike bike = new Bike(nextBikeId++, model, true, getUsernameById(userId));
+        bikes.put(bike.getId(), bike);
+        return bike;
     }
 
     public Bike addBike(String model, String owner) {
@@ -64,7 +93,7 @@ public class BikeRentalService {
     // Notify the user with the given ID, using the user service API
     private void notifyUser(int userId, String message) {
         Client client = ClientBuilder.newClient();
-        Response response = client.target(userServiceUrl + "/notify")
+        Response response = client.target(USER_SERVICE_URL + "/notify")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(Map.of("userId", userId, "message", message)));
 
@@ -99,13 +128,10 @@ public class BikeRentalService {
 
 
 
-    public boolean removeBike(int bikeId, String owner) {
+    public boolean removeBike(int bikeId) {
         Bike bike = bikes.get(bikeId);
         if (bike == null) {
             return false; // Bike does not exist
-        }
-        if (!bike.getOwner().equals(owner)) {
-            return false; // Not the owner
         }
         if (!bike.isAvailable()) {
             return false; // Bike is currently rented
