@@ -40,37 +40,23 @@ public class GustaveBikeService {
         return false;
     }
 
-//    public boolean addToBasket(int bikeId, String token) {
-//        User user = bikeRentalService.getUserService().getUserByToken(token);
-//        System.out.println("User: " + user);
-//        if (user == null) {
-//            throw new IllegalArgumentException("Invalid token");
-//        }
-//        Bike bike = bikeRentalService.getBikeById(bikeId);
-//        if (bike == null) {
-//            throw new IllegalArgumentException("Bike not found");
-//        }
-//        if (bike.isAvailable()) {
-//            bike.setAvailable(false);
-//            user.getBasket().addBike(bike);
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//
-//    public boolean buyBasket(String token) {
-//        User user = bikeRentalService.getUserService().getUserByToken(token);
-//        if (user == null) {
-//            throw new IllegalArgumentException("Invalid token");
-//        }
-//        Basket basket = user.getBasket();
-//        double totalPrice = basket.getTotalPrice();
-//        if (bankService.checkFunds(user.getId(), totalPrice, "EUR")) {
-//            bankService.processPayment(user.getId(), totalPrice, "EUR");
-//            basket.clearBasket();
-//            return true;
-//        }
-//        return false;
-//    }
+    public boolean buyBasket(User user) {
+        Basket basket = user.getBasket();
+        double totalPrice = basket.getTotalPrice();
+        if (totalPrice == 0.0) {
+            return false;
+        }
+        if(bankService.checkFunds(user.getId(), totalPrice, "EUR")) {
+            for (Bike bike : basket.getBikes()) {
+                bike.setOwner(user.getName());
+                bike.setAvailable(true);
+            }
+            basket.clearBasket();
+            bankService.processPayment(user.getId(), totalPrice, "EUR");
+            return true;
+        }
+        return false;
+    }
+
+
 }

@@ -163,13 +163,19 @@ public class BikeRentalController {
         return Response.ok(response).build();
     }
 
-//    @POST
-//    @Path("/gustaveBike/buyBasket")
-//    public Response buyBasket(@HeaderParam("Authorization") String token) {
-//        boolean success = gustaveBikeService.buyBasket(token);
-//        if (success) {
-//            return Response.ok("Basket purchased successfully").build();
-//        }
-//        return Response.status(Response.Status.BAD_REQUEST).entity("Insufficient funds or invalid token").build();
-//    }
+    @POST
+    @Path("/gustaveBike/basket/buy")
+    public Response buyBasket(@HeaderParam("Authorization") String token) {
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+        boolean success = gustaveBikeService.buyBasket(user);
+        if (success) {
+            return Response.ok("Basket purchased successfully").build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity("Basket purchase failed").build();
+    }
+
+
 }
