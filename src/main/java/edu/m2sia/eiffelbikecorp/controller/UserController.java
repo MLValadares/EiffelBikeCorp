@@ -31,4 +31,18 @@ public class UserController {
         }
         return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid credentials").build();
     }
+
+    @POST
+    @Path("/register")
+    public Response register(Map<String, String> user) {
+        String name = user.get("name");
+        String username = user.get("username");
+        String password = user.get("password");
+        boolean isAdded = userService.addUser(name, username, password);
+        if (isAdded) {
+            return Response.ok("User registered successfully").build();
+        } else {
+            return Response.status(Response.Status.CONFLICT).entity("Username already exists").build();
+        }
+    }
 }

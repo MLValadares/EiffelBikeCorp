@@ -4,7 +4,6 @@ import edu.m2sia.eiffelbikecorp.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 
 public class UserService {
     private static final Map<String, User> users = new HashMap<>(); // Keyed by username
@@ -15,6 +14,16 @@ public class UserService {
         // Predefined users for demo
         users.put("john_doe", new User(1, "John Doe", "john_doe", "password123"));
         users.put("jane_doe", new User(2, "Jane Doe", "jane_doe", "mypassword"));
+    }
+
+
+    public boolean addUser(String name, String username, String password) {
+        if (users.containsKey(username)) {
+            return false; // Username already exists
+        }
+        User user = new User(users.size() + 1, name, username, password);
+        users.put(username, user);
+        return true; // User added successfully
     }
 
     public String login(String username, String password) {
