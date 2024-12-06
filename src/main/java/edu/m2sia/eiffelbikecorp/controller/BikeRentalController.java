@@ -17,6 +17,8 @@ import java.util.Map;
 public class BikeRentalController {
     private static final UserService userService = new UserService();
     private static final BikeRentalService bikeService = new BikeRentalService(userService);
+    private static final BankService bankService = new BankService();
+    private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET
@@ -120,4 +122,43 @@ public class BikeRentalController {
 //        return Response.ok(queue).build();
 //    }
 
+    @GET
+    @Path("/gustaveBike/availableBikes")
+    public List<Bike> getAvailableBikesForSale() {
+        return gustaveBikeService.getAvailableBikesForSale();
+    }
+
+    @POST
+    @Path("/gustaveBike/basket/{bikeId}")
+    public Response addToBasket(@PathParam("bikeId") int bikeId, @HeaderParam("Authorization") String token) {
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+        boolean success = gustaveBikeService.addToBasket(bikeId, user);
+        if (success) {
+            return Response.ok("Bike added to basket").build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity("Bike not added to basket").build();
+    }
+
+    @GET
+    @Path("/gustaveBike/basket")
+    public Response getBasket(@HeaderParam("Authorization") String token) {
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+        return Response.ok(user.getBasket()).build();
+    }
+
+//    @POST
+//    @Path("/gustaveBike/buyBasket")
+//    public Response buyBasket(@HeaderParam("Authorization") String token) {
+//        boolean success = gustaveBikeService.buyBasket(token);
+//        if (success) {
+//            return Response.ok("Basket purchased successfully").build();
+//        }
+//        return Response.status(Response.Status.BAD_REQUEST).entity("Insufficient funds or invalid token").build();
+//    }
 }
