@@ -38,10 +38,10 @@ public class UserService {
         return null; // Authentication failed
     }
 
-    public User getUserByToken(String token) {
-//        System.out.println(sessions);
+    public Integer getUserIdByToken(String token) {
         String username = sessions.get(token);
-        return username != null ? users.get(username) : null;
+        User user = username != null ? users.get(username) : null;
+        return user != null ? user.getId() : null;
     }
 
     public void notifyUser(int userId, String message) {
@@ -50,5 +50,9 @@ public class UserService {
             // Implement your notification logic here (e.g., send an email, SMS, etc.)
             System.out.println("Notifying user " + user.getUsername() + ": " + message);
         }
+    }
+
+    public String getUsernameById(Integer userId) {
+        return users.values().stream().filter(u -> u.getId() == userId).findFirst().map(User::getUsername).orElse(null);
     }
 }

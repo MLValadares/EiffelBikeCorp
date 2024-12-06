@@ -2,17 +2,21 @@ package edu.m2sia.eiffelbikecorp.service;
 
 import edu.m2sia.eiffelbikecorp.model.Bike;
 import edu.m2sia.eiffelbikecorp.model.Rating;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.*;
 
 public class BikeRentalService {
+    private static final String USER_SERVICE_URL = "http://localhost:8080/EiffelBikeCorp_war_exploded/api/users";
     private static final Map<Integer, Bike> bikes = new HashMap<>();
     private static final Map<Integer, Integer> bikeRenters = new HashMap<>();
     private int nextBikeId = 1;
-    private final UserService userService;
 
-    public BikeRentalService(UserService userService) {
-        this.userService = userService;
+    public BikeRentalService() {
         // Initialize with some bikes
 //        bikes.add(new Bike(1, "Mountain Bike", true, "Eiffel Bike Corp"));
 //        bikes.add(new Bike(2, "Road Bike", true, "Eiffel Bike Corp"));
@@ -20,6 +24,36 @@ public class BikeRentalService {
         addBike("Mountain Bike", "Eiffel Bike Corp");
         addBike("Road Bike", "Eiffel Bike Corp");
         addBike("Hybrid Bike", "Eiffel Bike Corp");
+    }
+
+    public Integer getUserIdByToken(String token) {
+        Client client = ClientBuilder.newClient();
+        Response response = client.target(USER_SERVICE_URL + "/token")
+                .request(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .get();
+        System.out.println("Response status: " + response.getStatus());
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            return response.readEntity(Integer.class);
+        }
+        return null;
+    }
+
+    private String getUsernameById(Integer userId) {
+        Client client = ClientBuilder.newClient();
+        Response response = client.target(USER_SERVICE_URL + "/" + userId + "/username")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+            return response.readEntity(String.class);
+        }
+        return null;
+    }
+
+    public Bike addBike(String model, Integer userId) {
+        Bike bike = new Bike(nextBikeId++, model, true, getUsernameById(userId));
+        bikes.put(bike.getId(), bike);
+        return bike;
     }
 
     public Bike addBike(String model, String owner) {
@@ -63,7 +97,20 @@ public class BikeRentalService {
         return RentBikeResult.NOT_AVAILABLE;
     }
 
-    public Bike returnBike(int id, int userId, int conditionRating, String conditionNotes) {
+
+    // Notify the user with the given ID, using the user service API
+    private void notifyUser(int userId, String message) {
+        Client client = ClientBuilder.newClient();
+        Response response = client.target(USER_SERVICE_URL + "/notify")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(Map.of("userId", userId, "message", message)));
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            System.out.println("Failed to notify user " + userId);
+        }
+    }
+
+            public Bike returnBike(int id, int userId, int conditionRating, String conditionNotes) {
 //        System.out.println("bikeRenters: " + bikeRenters);
         if (bikeRenters.containsKey(id) && bikeRenters.get(id).equals(userId)) {
             Bike bike = bikes.get(id);
@@ -79,25 +126,20 @@ public class BikeRentalService {
                 //notify the next user in the waiting list
                 Integer nextUser = bike.getNextUserInWaitingList();
                 if (nextUser != null) {
-                    userService.notifyUser(nextUser, "The bike with ID " + id + " is now available for rent.");
+                    notifyUser(nextUser, "The bike with ID " + id + " is now available for rent.");
                 }
                 return bike;
             }
         }
         return null; // Unauthorized or invalid return
-
-        //notify the next user in the waiting list
     }
 
 
 
-    public boolean removeBike(int bikeId, String owner) {
+    public boolean removeBike(int bikeId) {
         Bike bike = bikes.get(bikeId);
         if (bike == null) {
             return false; // Bike does not exist
-        }
-        if (!bike.getOwner().equals(owner)) {
-            return false; // Not the owner
         }
         if (!bike.isAvailable()) {
             return false; // Bike is currently rented

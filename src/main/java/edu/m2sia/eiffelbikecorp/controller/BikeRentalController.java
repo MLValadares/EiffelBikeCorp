@@ -22,6 +22,7 @@ public class BikeRentalController {
     private static final BankService bankService = new BankService(currencyExchangeService);
     private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
 
+
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET
 //    @Path("/hello")
@@ -42,12 +43,11 @@ public class BikeRentalController {
     public Response rentBike(@PathParam("id") int id,
                              @HeaderParam("Authorization") String token,
                              @QueryParam("waitingList") @DefaultValue("false") boolean waitingList) {
-        User user = userService.getUserByToken(token);
-//        System.out.println("waitingList: " + waitingList);
-        if (user == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
-        }
-        BikeRentalService.RentBikeResult result = bikeService.rentBike(id, user.getId(), waitingList);
+            Integer userId = bikeService.getUserIdByToken(token);
+            if (userId == null) {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+            }
+        BikeRentalService.RentBikeResult result = bikeService.rentBike(id, userId, waitingList);
         return switch (result) {
             case SUCCESS -> Response.ok("Bike rented successfully").build();
             case NOT_AVAILABLE -> Response.status(Response.Status.BAD_REQUEST).entity("Bike is not available").build();
@@ -62,8 +62,8 @@ public class BikeRentalController {
             @HeaderParam("Authorization") String token,
             @QueryParam("conditionRating") int conditionRating,
             @QueryParam("conditionNotes") String conditionNotes) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        Integer userId = bikeService.getUserIdByToken(token);
+        if (userId == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
 
@@ -72,7 +72,7 @@ public class BikeRentalController {
                     .entity("Condition rating must be between 1 and 5.").build();
         }
 
-        Bike returnedBike = bikeService.returnBike(id, user.getId(), conditionRating, conditionNotes); // Pass user ID
+        Bike returnedBike = bikeService.returnBike(id, userId, conditionRating, conditionNotes); // Pass user ID
 //        System.out.println("Returned bike: " + returnedBike);
         if (returnedBike != null) {
             return Response.ok(returnedBike).build();
@@ -85,8 +85,8 @@ public class BikeRentalController {
     @PUT
     @Path("/add")
     public Response addBike(@HeaderParam("Authorization") String token, Map<String, String> bikeData) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        Integer userId = bikeService.getUserIdByToken(token);
+        if (userId == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
 
@@ -95,19 +95,19 @@ public class BikeRentalController {
             return Response.status(Response.Status.BAD_REQUEST).entity("Bike model is required").build();
         }
 
-        Bike newBike = bikeService.addBike(model, user.getUsername());
+        Bike newBike = bikeService.addBike(model, userId);
         return Response.ok(newBike).build();
     }
 
     @DELETE
     @Path("/remove/{bikeId}")
     public Response removeBike(@HeaderParam("Authorization") String token, @PathParam("bikeId") int bikeId) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        Integer userId = bikeService.getUserIdByToken(token);
+        if (userId == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
 
-        boolean removed = bikeService.removeBike(bikeId, user.getUsername());
+        boolean removed = bikeService.removeBike(bikeId);
         if (!removed) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Bike cannot be removed. Ensure you own the bike and it is not currently rented.")
