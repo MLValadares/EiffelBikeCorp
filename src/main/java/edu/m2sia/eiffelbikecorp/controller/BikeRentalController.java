@@ -18,9 +18,9 @@ import java.util.Map;
 public class BikeRentalController {
     private static final UserService userService = new UserService();
     private static final BikeRentalService bikeService = new BikeRentalService(userService);
-    private static final BankService bankService = new BankService();
-    private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
     private static final CurrencyExchangeService currencyExchangeService = new CurrencyExchangeService();
+    private static final BankService bankService = new BankService(currencyExchangeService);
+    private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET
@@ -165,12 +165,12 @@ public class BikeRentalController {
 
     @POST
     @Path("/gustaveBike/basket/buy")
-    public Response buyBasket(@HeaderParam("Authorization") String token) {
+    public Response buyBasket(@HeaderParam("Authorization") String token, @QueryParam("currency") String currency) {
         User user = userService.getUserByToken(token);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
         }
-        boolean success = gustaveBikeService.buyBasket(user);
+        boolean success = gustaveBikeService.buyBasket(user, currency);
         if (success) {
             return Response.ok("Basket purchased successfully").build();
         }

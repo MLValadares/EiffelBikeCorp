@@ -40,19 +40,19 @@ public class GustaveBikeService {
         return false;
     }
 
-    public boolean buyBasket(User user) {
+    public boolean buyBasket(User user, String currency) {
         Basket basket = user.getBasket();
         double totalPrice = basket.getTotalPrice();
         if (totalPrice == 0.0) {
             return false;
         }
-        if(bankService.checkFunds(user.getId(), totalPrice, "EUR")) {
+        if(bankService.checkFunds(user.getId(), totalPrice, currency)) {
             for (Bike bike : basket.getBikes()) {
                 bike.setOwner(user.getName());
                 bike.setAvailable(true);
             }
             basket.clearBasket();
-            bankService.processPayment(user.getId(), totalPrice, "EUR");
+            bankService.processPayment(user.getId(), totalPrice, currency);
             return true;
         }
         return false;
