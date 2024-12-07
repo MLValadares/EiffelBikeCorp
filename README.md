@@ -1,5 +1,10 @@
 # Eiffel Bike Corp
+
 Eiffel Bike Corp is a bike rental and sales service application. This project is built using Java and Maven, and it provides a RESTful API for managing bike rentals and sales. Beyond the project itself, it includes a report and this `README.md` file, which serves as a user manual.
+
+## Authors
+
+Miguel Valadares - nº 283781, Miguel Cordeiro - nº 283767
 
 ## Table of Contents
 
