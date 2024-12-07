@@ -1,7 +1,5 @@
 package edu.m2sia.eiffelbikecorp.model;
 
-import edu.m2sia.eiffelbikecorp.service.BikeRentalService;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +8,7 @@ public class User {
     private String name;
     private String username; // New field for authentication
     private String password; // New field for authentication
-    private final List<Integer> rentedBikeIds = new ArrayList<>(); // List of rented bike IDs
-    private final Basket basket = new Basket(); // New field for shopping basket
+    private static final List<Integer> rentedBikeIds = new ArrayList<>(); // List of rented bike IDs
 
     // Constructor
     public User(int id, String name, String username, String password) {
@@ -64,9 +61,5 @@ public class User {
 
     public void returnBike(int bikeId) {
         rentedBikeIds.remove(Integer.valueOf(bikeId));
-    }
-
-    public Basket getBasket() {
-        return basket;
     }
 }

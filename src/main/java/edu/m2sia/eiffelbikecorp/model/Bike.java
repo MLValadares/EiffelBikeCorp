@@ -10,9 +10,8 @@ public class Bike {
     private String model;
     private boolean isAvailable;
     private String owner;
-    private final List<Rating> ratings = new ArrayList<>(); //não por static
+    private static final List<Rating> ratings = new ArrayList<>();
     private final Queue<Integer> waitingList = new LinkedList<>();
-    private double price = 1000.0;
 
     // Constructor
     public Bike(int id, String model, boolean isAvailable, String owner) {
@@ -78,9 +77,5 @@ public class Bike {
 
     public Integer getNextUserInWaitingList() {
         return waitingList.poll();
-    }
-
-    public double getPrice() {
-        return price;
     }
 }
