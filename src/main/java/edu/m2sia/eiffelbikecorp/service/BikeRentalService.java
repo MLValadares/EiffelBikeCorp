@@ -36,10 +36,6 @@ public class BikeRentalService {
         return bikes.get(bikeId);
     }
 
-    public UserService getUserService() {
-        return userService;
-    }
-
     public enum RentBikeResult {
         SUCCESS,
         NOT_AVAILABLE,
@@ -86,7 +82,6 @@ public class BikeRentalService {
         }
         return null; // Unauthorized or invalid return
 
-        //notify the next user in the waiting list
     }
 
 
