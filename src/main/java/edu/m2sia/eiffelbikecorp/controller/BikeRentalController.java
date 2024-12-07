@@ -6,7 +6,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +15,8 @@ import java.util.Map;
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/bikeRental")
 public class BikeRentalController {
-    private static final UserService userService = new UserService();
-    private static final BikeRentalService bikeService = new BikeRentalService(userService);
-    private static final CurrencyExchangeService currencyExchangeService = new CurrencyExchangeService();
-    private static final BankService bankService = new BankService(currencyExchangeService);
-    private static final GustaveBikeService gustaveBikeService = new GustaveBikeService(bikeService, bankService);
-
+//    private static final UserService userService = new UserService();
+    private static final BikeRentalService bikeService = new BikeRentalService();
 
 //    http://localhost:8080/EiffelBikeCorp_war_exploded/api/bikeRental/hello
 //    @GET
@@ -123,59 +118,5 @@ public class BikeRentalController {
 //        Queue<String> queue = bikeService.getWaitingList(bikeId);
 //        return Response.ok(queue).build();
 //    }
-
-    @GET
-    @Path("/gustaveBike/availableBikes")
-    public List<Bike> getAvailableBikesForSale() {
-        return gustaveBikeService.getAvailableBikesForSale();
-    }
-
-    @POST
-    @Path("/gustaveBike/basket/{bikeId}")
-    public Response addToBasket(@PathParam("bikeId") int bikeId, @HeaderParam("Authorization") String token) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
-        }
-        boolean success = gustaveBikeService.addToBasket(bikeId, user);
-        if (success) {
-            return Response.ok("Bike added to basket").build();
-        }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Bike not added to basket").build();
-    }
-
-    @GET
-    @Path("/gustaveBike/basket")
-    public Response getBasket(@HeaderParam("Authorization") String token, @QueryParam("currency") String currency) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
-        }
-        Basket basket = user.getBasket();
-        double totalPrice = basket.getTotalPrice();
-        Map<String, Object> response = new HashMap<>();
-        response.put("bikes", basket.getBikes());
-        response.put("totalPrice", totalPrice);
-        if (currency != null && !currency.isEmpty()) {
-            double convertedPrice = currencyExchangeService.convert(totalPrice, currency);
-            response.put("totalPriceIn" + currency, convertedPrice);
-        }
-        return Response.ok(response).build();
-    }
-
-    @POST
-    @Path("/gustaveBike/basket/buy")
-    public Response buyBasket(@HeaderParam("Authorization") String token, @QueryParam("currency") String currency) {
-        User user = userService.getUserByToken(token);
-        if (user == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
-        }
-        boolean success = gustaveBikeService.buyBasket(user, currency);
-        if (success) {
-            return Response.ok("Basket purchased successfully").build();
-        }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Basket purchase failed").build();
-    }
-
 
 }
