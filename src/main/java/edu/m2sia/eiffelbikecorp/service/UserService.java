@@ -18,8 +18,9 @@ public class UserService {
 
     public UserService() {
         // Predefined users for demo
-        users.put("john_doe", new User(1, "John Doe", "john_doe", "password123"));
-        users.put("jane_doe", new User(2, "Jane Doe", "jane_doe", "mypassword"));
+        users.put("john_doe", new User(1, "John Doe", "john_doe", "password123", false));
+        users.put("jane_doe", new User(2, "Jane Doe", "jane_doe", "mypassword", false));
+        users.put("admin", new User(3, "Admin", "admin", "admin", true));
     }
 
 
@@ -27,7 +28,7 @@ public class UserService {
         if (users.containsKey(username)) {
             return false; // Username already exists
         }
-        User user = new User(users.size() + 1, name, username, password);
+        User user = new User(users.size() + 1, name, username, password, false);
         users.put(username, user);
         return true; // User added successfully
     }

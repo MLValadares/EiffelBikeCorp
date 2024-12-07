@@ -10,15 +10,17 @@ public class User {
     private String name;
     private String username; // New field for authentication
     private String password; // New field for authentication
+    private boolean isEmployee;
     private final List<Integer> rentedBikeIds = new ArrayList<>(); // List of rented bike IDs
     private final Basket basket = new Basket(); // New field for shopping basket
 
     // Constructor
-    public User(int id, String name, String username, String password) {
+    public User(int id, String name, String username, String password,  boolean isEmployee) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.password = password;
+        this.isEmployee = isEmployee;
     }
 
     // Getters and Setters
@@ -48,6 +50,14 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isEmployee() {
+        return isEmployee;
+    }
+
+    public void setEmployee(boolean employee) {
+        isEmployee = employee;
     }
 
     public void setPassword(String password) {

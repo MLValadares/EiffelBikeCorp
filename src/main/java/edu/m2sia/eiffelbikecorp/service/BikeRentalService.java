@@ -23,7 +23,8 @@ public class BikeRentalService {
     }
 
     public Bike addBike(String model, String owner) {
-        Bike bike = new Bike(nextBikeId++, model, true, owner);
+//        Bike bike = new Bike(nextBikeId++, model, true, owner);
+        Bike bike = new Bike(nextBikeId++, model, true, "Eiffel Bike Corp");
         bikes.put(bike.getId(), bike);
         return bike;
     }

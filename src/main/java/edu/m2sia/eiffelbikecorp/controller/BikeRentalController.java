@@ -94,6 +94,9 @@ public class BikeRentalController {
         if (model == null || model.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Bike model is required").build();
         }
+        if (!user.isEmployee()) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Only employees can add bikes").build();
+        }
 
         Bike newBike = bikeService.addBike(model, user.getUsername());
         return Response.ok(newBike).build();
@@ -105,6 +108,9 @@ public class BikeRentalController {
         User user = userService.getUserByToken(token);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+        if (!user.isEmployee()) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Only employees can remove bikes").build();
         }
 
         boolean removed = bikeService.removeBike(bikeId, user.getUsername());
