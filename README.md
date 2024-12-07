@@ -1,9 +1,18 @@
+# Eiffel Bike Corp
+Eiffel Bike Corp is a bike rental and sales service application. This project is built using Java and Maven, and it provides a RESTful API for managing bike rentals and sales. Beyond the project itself, it includes a report and this `README.md` file, which serves as a user manual.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+
 ## Installation
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/eiffel-bike-corp.git
-    cd eiffel-bike-corp
+    git clone https://github.com/MLValadares/EiffelBikeCorp.git
+    cd EiffelBikeCorp
     ```
 
 2. Build the project using Maven:
