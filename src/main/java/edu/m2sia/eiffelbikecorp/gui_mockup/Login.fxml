@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.m2sia.eiffelbikecorp.gui.LoginController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    <Vgap>10</Vgap>
+    <Hgap>10</Hgap>
+
+    <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1" promptText="Username"/>
+    <PasswordField fx:id="passwordField" GridPane.rowIndex="1" GridPane.columnIndex="1" promptText="Password"/>
+    <Button text="Login" onAction="#handleLogin" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+    <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+</GridPane>
