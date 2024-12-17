@@ -105,3 +105,7 @@ To check if the application is running, you can open a browser with: `http://loc
     Headers: Authorization: <token>
     Query Params: currency (optional)
     ```
+
+
+## Currency API used
+https://github.com/fawazahmed0/exchange-api
